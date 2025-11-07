@@ -1,0 +1,39 @@
+<mat-toolbar color="primary" class="navbar">
+  <button 
+    mat-icon-button 
+    (click)="onToggleSidebar()"
+    aria-label="Toggle menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <span class="app-title">
+    <mat-icon>inventory_2</mat-icon>
+    Control de Inventario
+  </span>
+
+  <span class="spacer"></span>
+
+  <div class="user-menu" *ngIf="currentUser">
+    <button mat-button [matMenuTriggerFor]="menu" class="user-button">
+      <mat-icon>account_circle</mat-icon>
+      <span class="username">{{ currentUser.username }}</span>
+      <mat-icon>arrow_drop_down</mat-icon>
+    </button>
+
+    <mat-menu #menu="matMenu">
+      <div class="user-info">
+        <p class="user-name">{{ currentUser.username }}</p>
+        <p class="user-email">{{ currentUser.email }}</p>
+        <p class="user-role">
+          <mat-icon>{{ currentUser.role === 'admin' ? 'admin_panel_settings' : 'person' }}</mat-icon>
+          {{ currentUser.role === 'admin' ? 'Administrador' : 'Empleado' }}
+        </p>
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Cerrar Sesión</span>
+      </button>
+    </mat-menu>
+  </div>
+</mat-toolbar>

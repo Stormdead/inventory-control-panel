@@ -1,0 +1,59 @@
+<mat-sidenav-container class="movement-form-container">
+  <mat-sidenav #sidenav [opened]="sidebarOpened" [mode]="'side'">
+    <app-sidebar></app-sidebar>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <app-navbar (toggleSidebar)="onToggleSidebar()"></app-navbar>
+
+    <div class="movement-form-content" style="padding:24px;">
+      <app-loading *ngIf="loading"></app-loading>
+
+      <div *ngIf="!loading">
+        <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h2><mat-icon>swap_horiz</mat-icon> Nuevo Movimiento</h2>
+        </div>
+
+        <mat-card>
+          <mat-card-content>
+            <form [formGroup]="movementForm" (ngSubmit)="onSubmit()">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Producto</mat-label>
+                <mat-select formControlName="product_id">
+                  <mat-option *ngFor="let p of products" [value]="p.id">
+                    {{ p.name }} - {{ p.category?.name || 'Sin categoría' }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Tipo</mat-label>
+                <mat-select formControlName="type">
+                  <mat-option value="entrada">Entrada</mat-option>
+                  <mat-option value="salida">Salida</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Cantidad</mat-label>
+                <input matInput type="number" formControlName="quantity" min="1">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Descripción (opcional)</mat-label>
+                <input matInput formControlName="description">
+              </mat-form-field>
+
+              <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px;">
+                <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
+                <button mat-raised-button color="primary" type="submit" [disabled]="submitting">
+                  <mat-icon>save</mat-icon> Crear
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -1,0 +1,178 @@
+<mat-sidenav-container class="product-form-container">
+  <mat-sidenav 
+    #sidenav 
+    [opened]="sidebarOpened" 
+    [mode]="'side'"
+    class="product-sidenav">
+    <app-sidebar></app-sidebar>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <app-navbar (toggleSidebar)="onToggleSidebar()"></app-navbar>
+
+    <div class="product-form-content">
+      <app-loading *ngIf="loading"></app-loading>
+
+      <div *ngIf="!loading">
+        <!-- Header -->
+        <div class="page-header">
+          <h1>
+            <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
+            {{ isEditMode ? 'Editar Producto' : 'Nuevo Producto' }}
+          </h1>
+          <p class="subtitle">
+            {{ isEditMode ? 'Modifica los datos del producto' : 'Completa los datos del nuevo producto' }}
+          </p>
+        </div>
+
+        <!-- Form -->
+        <mat-card class="form-card">
+          <mat-card-content>
+            <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+              <div class="form-grid">
+                <!-- Name -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Nombre del Producto</mat-label>
+                  <input 
+                    matInput 
+                    formControlName="name"
+                    placeholder="Ej: Laptop Dell XPS 13">
+                  <mat-icon matPrefix>inventory_2</mat-icon>
+                  <mat-error *ngIf="name?.hasError('required')">
+                    El nombre es requerido
+                  </mat-error>
+                  <mat-error *ngIf="name?.hasError('minlength')">
+                    Mínimo 3 caracteres
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Description -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Descripción</mat-label>
+                  <textarea 
+                    matInput 
+                    formControlName="description"
+                    rows="4"
+                    placeholder="Describe las características del producto">
+                  </textarea>
+                  <mat-icon matPrefix>description</mat-icon>
+                  <mat-error *ngIf="description?.hasError('required')">
+                    La descripción es requerida
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Category -->
+                <mat-form-field appearance="outline">
+                  <mat-label>Categoría</mat-label>
+                  <mat-select formControlName="category_id">
+                    <mat-option [value]="null">Sin categoría</mat-option>
+                    <mat-option *ngFor="let category of categories" [value]="category.id">
+                      {{ category.name }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-icon matPrefix>category</mat-icon>
+                </mat-form-field>
+
+                <!-- Price -->
+                <mat-form-field appearance="outline">
+                  <mat-label>Precio</mat-label>
+                  <input 
+                    matInput 
+                    type="number"
+                    formControlName="price"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00">
+                  <span matPrefix>$&nbsp;</span>
+                  <mat-error *ngIf="price?.hasError('required')">
+                    El precio es requerido
+                  </mat-error>
+                  <mat-error *ngIf="price?.hasError('min')">
+                    El precio debe ser mayor a 0
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Stock -->
+                <mat-form-field appearance="outline">
+                  <mat-label>Stock</mat-label>
+                  <input 
+                    matInput 
+                    type="number"
+                    formControlName="stock"
+                    min="0"
+                    placeholder="0">
+                  <mat-icon matPrefix>inventory</mat-icon>
+                  <mat-error *ngIf="stock?.hasError('required')">
+                    El stock es requerido
+                  </mat-error>
+                  <mat-error *ngIf="stock?.hasError('min')">
+                    El stock no puede ser negativo
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Image URL -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>URL de Imagen (opcional)</mat-label>
+                  <input 
+                    matInput 
+                    formControlName="image_url"
+                    placeholder="https://ejemplo.com/imagen.jpg">
+                  <mat-icon matPrefix>image</mat-icon>
+                </mat-form-field>
+
+                <!-- Image Preview -->
+                <div class="image-preview" *ngIf="productForm.get('image_url')?.value">
+                  <p class="preview-label">Vista previa:</p>
+                  <img 
+                    [src]="productForm.get('image_url')?.value" 
+                    alt="Preview"
+                    (error)="onImageError($event)">
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="form-actions">
+                <button 
+                  mat-stroked-button 
+                  type="button"
+                  (click)="cancel()"
+                  [disabled]="submitting">
+                  <mat-icon>close</mat-icon>
+                  Cancelar
+                </button>
+                <button 
+                  mat-raised-button 
+                  color="primary"
+                  type="submit"
+                  [disabled]="productForm.invalid || submitting">
+                  <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+                  {{ submitting ? 'Guardando...' : (isEditMode ? 'Actualizar' : 'Crear') }}
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Help Card -->
+        <mat-card class="help-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>info</mat-icon>
+              Ayuda
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <ul>
+              <li><strong>Nombre:</strong> Identifica claramente el producto</li>
+              <li><strong>Descripción:</strong> Detalla las características importantes</li>
+              <li><strong>Categoría:</strong> Facilita la organización y búsqueda</li>
+              <li><strong>Precio:</strong> Valor unitario del producto</li>
+              <li><strong>Stock:</strong> Cantidad disponible en inventario</li>
+              <li><strong>Imagen:</strong> URL de una imagen externa (opcional)</li>
+            </ul>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
